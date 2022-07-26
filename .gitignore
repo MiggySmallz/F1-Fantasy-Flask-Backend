@@ -4,7 +4,7 @@ env/
 /node_modules
 /Lib
 /f1Fantasy
-/cache
+# /cache
 TableCreation.sql
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
