@@ -29,7 +29,7 @@ CORS(app)
 
 @app.route('/')
 def hello():
-    return "Hello Worlds"
+    return "Hello World"
 
 @app.route('/get_races')
 def get_races():
@@ -52,7 +52,7 @@ def get_image():
 # @cross_origin()
 
 def drivers():
-    fastf1.Cache.enable_cache('../cache')
+    fastf1.Cache.enable_cache('./cache')
 
     abu_dhabi_race = fastf1.get_session(2022, 'Australia', 'R')
 
@@ -81,7 +81,7 @@ def drivers():
 @app.route('/getRaceResults', methods = ['GET', 'POST'])
 def getRaceResults():
     
-    fastf1.Cache.enable_cache('../cache')
+    fastf1.Cache.enable_cache('./cache')
     data = request.get_json()
 
     abu_dhabi_race = fastf1.get_session(int(data["year"]), data["race"], 'R')
@@ -122,7 +122,7 @@ def getRaceResults():
 @app.route('/sendYear', methods = ['GET', 'POST'])
 def sendYear():
     
-    fastf1.Cache.enable_cache('../cache')
+    fastf1.Cache.enable_cache('./cache')
 
     data = request.get_json()
     

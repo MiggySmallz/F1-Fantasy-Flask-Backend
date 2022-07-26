@@ -27,7 +27,7 @@ from dotenv import load_dotenv
 
 
 def raceStats():
-    fastf1.Cache.enable_cache('C:/Users/mnobr/Desktop/Projects/F1-Fantasy/flask-server/cache')
+    fastf1.Cache.enable_cache('./cache')
 
     abu_dhabi_race = fastf1.get_session(2022, 'Australia', 'R')
 
@@ -143,7 +143,7 @@ def testDB():
     cur.execute("INSERT INTO test2 (id, fname, lname, email, pass) VALUES (1, 'Miguel', 'Nobre', 'mnobre24@gmail.com', '1234qwer')")
     conn.commit()
 
-testDB()
+raceStats()
 # raceStats()
 
 
