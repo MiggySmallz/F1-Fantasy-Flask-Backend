@@ -29,7 +29,7 @@ CORS(app)
 
 @app.route('/')
 def hello():
-    return "Hello World"
+    return "Hello Worlds"
 
 @app.route('/get_races')
 def get_races():
