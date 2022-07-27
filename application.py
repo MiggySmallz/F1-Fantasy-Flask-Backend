@@ -151,7 +151,7 @@ def signUp():
 
     conn = pymysql.connect(
             host= HOST, 
-            port = int(PORT),
+            port = PORT,
             user = USER, 
             password = PASSWORD,
             db = DB,
@@ -178,7 +178,7 @@ def logIn():
 
     conn = pymysql.connect(
             host= HOST, 
-            port = int(PORT),
+            port = PORT,
             user = USER, 
             password = PASSWORD,
             db = DB,
@@ -220,7 +220,7 @@ def getUserName():
 
     conn = pymysql.connect(
             host= HOST, 
-            port = int(PORT),
+            port = PORT,
             user = USER, 
             password = PASSWORD,
             db = DB,
@@ -250,7 +250,7 @@ def driversInfo():
 
     conn = pymysql.connect(
             host= HOST, 
-            port = int(PORT),
+            port = PORT,
             user = USER, 
             password = PASSWORD,
             db = DB,
@@ -294,7 +294,7 @@ def saveTeam():
 
     conn = pymysql.connect(
             host= HOST, 
-            port = int(PORT),
+            port = PORT,
             user = USER, 
             password = PASSWORD,
             db = DB,
@@ -340,7 +340,7 @@ def getUsersTeams():
 
     conn = pymysql.connect(
             host= HOST, 
-            port = int(PORT),
+            port = PORT,
             user = USER, 
             password = PASSWORD,
             db = DB,
