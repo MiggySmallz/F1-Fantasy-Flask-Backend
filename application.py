@@ -27,9 +27,9 @@ application = Flask(__name__)
 app = application
 CORS(app)
 
-@app.route('/')
-def hello():
-    return "Hello World"
+# @app.route('/')
+# def hello():
+#     return "Hello World"
 
 @app.route('/get_races')
 def get_races():
