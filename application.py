@@ -294,7 +294,7 @@ def saveTeam():
 
     conn = pymysql.connect(
             host= HOST, 
-            port = PORT,
+            port = int(PORT),
             user = USER, 
             password = PASSWORD,
             db = DB,
@@ -340,7 +340,7 @@ def getUsersTeams():
 
     conn = pymysql.connect(
             host= HOST, 
-            port = PORT,
+            port = int(PORT),
             user = USER, 
             password = PASSWORD,
             db = DB,
