@@ -3,4 +3,6 @@ start server -> python server.py
 get sql running -> py -m pip install PyMySQL
 install npm -> py -m pip install nodeenv
 
+eb deploy --staged
+
 if you get "from dotenv import load_dotenv ModuleNotFoundError: No module named 'dotenv'" -> python -m pip install python-dotenv

@@ -31,6 +31,12 @@ CORS(app)
 # def hello():
 #     return "Hello World"
 
+HOST = os.getenv('HOST')
+PORT = os.getenv('PORT')
+USER = os.getenv('USER')
+PASSWORD = os.getenv('PASSWORD')
+DB = os.getenv('DB')
+
 @app.route('/get_races')
 def get_races():
     a = fastf1.get_event_schedule(1950,include_testing=False, force_ergast=False)
@@ -141,13 +147,7 @@ def signUp():
 
     data = request.get_json()
     
-    load_dotenv()
-
-    HOST = os.getenv('HOST')
-    PORT = os.getenv('PORT')
-    USER = os.getenv('USER')
-    PASSWORD = os.getenv('PASSWORD')
-    DB = os.getenv('DB')
+    load_dotenv() 
 
     conn = pymysql.connect(
             host= HOST, 
@@ -169,12 +169,6 @@ def logIn():
     data = request.get_json()
     
     load_dotenv()
-
-    HOST = os.getenv('HOST')
-    PORT = os.getenv('PORT')
-    USER = os.getenv('USER')
-    PASSWORD = os.getenv('PASSWORD')
-    DB = os.getenv('DB')
 
     conn = pymysql.connect(
             host= HOST, 
@@ -212,12 +206,6 @@ def getUserName():
     
     load_dotenv()
 
-    HOST = os.getenv('HOST')
-    PORT = os.getenv('PORT')
-    USER = os.getenv('USER')
-    PASSWORD = os.getenv('PASSWORD')
-    DB = os.getenv('DB')
-
     conn = pymysql.connect(
             host= HOST, 
             port = PORT,
@@ -241,12 +229,6 @@ def driversInfo():
     data = request.get_json()
     
     load_dotenv()
-
-    HOST = os.getenv('HOST')
-    PORT = os.getenv('PORT')
-    USER = os.getenv('USER')
-    PASSWORD = os.getenv('PASSWORD')
-    DB = os.getenv('DB')
 
     conn = pymysql.connect(
             host= HOST, 
@@ -281,16 +263,10 @@ def driversInfo():
 
 @app.route('/saveTeam', methods = ['POST'])
 def saveTeam():
-
+    
     data = request.get_json()
     
     load_dotenv()
-
-    HOST = os.getenv('HOST')
-    PORT = os.getenv('PORT')
-    USER = os.getenv('USER')
-    PASSWORD = os.getenv('PASSWORD')
-    DB = os.getenv('DB')
 
     conn = pymysql.connect(
             host= HOST, 
@@ -331,12 +307,6 @@ def getUsersTeams():
     data = request.get_json()
     
     load_dotenv()
-
-    HOST = os.getenv('HOST')
-    PORT = os.getenv('PORT')
-    USER = os.getenv('USER')
-    PASSWORD = os.getenv('PASSWORD')
-    DB = os.getenv('DB')
 
     conn = pymysql.connect(
             host= HOST, 
@@ -390,9 +360,6 @@ def getUsersTeams():
                 # print("teamName: " + str(team[i]))     
                 teamList[teamName] = currentTeam 
                 currentTeam = []
-                
-
-            
 
            
     cur.execute("SELECT * FROM drivers WHERE id = 14")
@@ -407,6 +374,6 @@ def getUsersTeams():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    app.run(ssl_context='adhoc')
+    # app.run(ssl_context='adhoc')
 
 
