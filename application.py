@@ -32,7 +32,8 @@ CORS(app)
 #     return "Hello World"
 
 HOST = os.getenv('HOST')
-PORT = os.getenv('PORT')
+# PORT = os.getenv('PORT')
+PORT = 3306
 USER = os.getenv('USER')
 PASSWORD = os.getenv('PASSWORD')
 DB = os.getenv('DB')
