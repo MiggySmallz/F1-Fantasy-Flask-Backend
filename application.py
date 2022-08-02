@@ -38,7 +38,7 @@ CORS(app)
 HOST = 'f1-fantasy.cxitdoz2usg3.us-east-2.rds.amazonaws.com'
 PORT = 3306
 USER = 'admin'
-PASSWORD = 's%ESKyr8A%%'
+PASSWORD = os.environ['PASSWORD']
 DB = 'Table1'
 
 @app.route('/get_races')
