@@ -27,16 +27,18 @@ application = Flask(__name__)
 app = application
 CORS(app)
 
-# @app.route('/')
-# def hello():
-#     return "Hello World"
 
-HOST = os.getenv('HOST')
-# PORT = os.getenv('PORT')
+# HOST = os.getenv('HOST')
+# PORT = 3306
+# USER = os.getenv('USER')
+# PASSWORD = os.getenv('PASSWORD')
+# DB = os.getenv('DB')
+
+
+HOST = 'f1-fantasy.cxitdoz2usg3.us-east-2.rds.amazonaws.com'
 PORT = 3306
-USER = os.getenv('USER')
-PASSWORD = os.getenv('PASSWORD')
-DB = os.getenv('DB')
+USER = 'admin'
+DB = 'Table1'
 
 @app.route('/get_races')
 def get_races():
