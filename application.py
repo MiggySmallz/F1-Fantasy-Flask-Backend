@@ -156,7 +156,7 @@ def signUp():
             host= HOST, 
             port = PORT,
             user = USER, 
-            password = PASSWORD,
+            # password = PASSWORD,
             db = DB,
             )
 
@@ -177,7 +177,7 @@ def logIn():
             host= HOST, 
             port = PORT,
             user = USER, 
-            password = PASSWORD,
+            # password = PASSWORD,
             db = DB,
             )
 
@@ -213,7 +213,7 @@ def getUserName():
             host= HOST, 
             port = PORT,
             user = USER, 
-            password = PASSWORD,
+            # password = PASSWORD,
             db = DB,
             )
 
@@ -237,7 +237,7 @@ def driversInfo():
             host= HOST, 
             port = PORT,
             user = USER, 
-            password = PASSWORD,
+            # password = PASSWORD,
             db = DB,
             )
 
@@ -275,7 +275,7 @@ def saveTeam():
             host= HOST, 
             port = int(PORT),
             user = USER, 
-            password = PASSWORD,
+            # password = PASSWORD,
             db = DB,
             )
 
@@ -315,7 +315,7 @@ def getUsersTeams():
             host= HOST, 
             port = int(PORT),
             user = USER, 
-            password = PASSWORD,
+            # password = PASSWORD,
             db = DB,
             )
 
