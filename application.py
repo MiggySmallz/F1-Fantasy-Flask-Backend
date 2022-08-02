@@ -38,6 +38,7 @@ CORS(app)
 HOST = 'f1-fantasy.cxitdoz2usg3.us-east-2.rds.amazonaws.com'
 PORT = 3306
 USER = 'admin'
+PASSWORD = 's%ESKyr8A%%'
 DB = 'Table1'
 
 @app.route('/get_races')
@@ -156,7 +157,7 @@ def signUp():
             host= HOST, 
             port = PORT,
             user = USER, 
-            # password = PASSWORD,
+            password = PASSWORD,
             db = DB,
             )
 
@@ -177,7 +178,7 @@ def logIn():
             host= HOST, 
             port = PORT,
             user = USER, 
-            # password = PASSWORD,
+            password = PASSWORD,
             db = DB,
             )
 
@@ -213,7 +214,7 @@ def getUserName():
             host= HOST, 
             port = PORT,
             user = USER, 
-            # password = PASSWORD,
+            password = PASSWORD,
             db = DB,
             )
 
@@ -237,7 +238,7 @@ def driversInfo():
             host= HOST, 
             port = PORT,
             user = USER, 
-            # password = PASSWORD,
+            password = PASSWORD,
             db = DB,
             )
 
@@ -275,7 +276,7 @@ def saveTeam():
             host= HOST, 
             port = int(PORT),
             user = USER, 
-            # password = PASSWORD,
+            password = PASSWORD,
             db = DB,
             )
 
@@ -315,7 +316,7 @@ def getUsersTeams():
             host= HOST, 
             port = int(PORT),
             user = USER, 
-            # password = PASSWORD,
+            password = PASSWORD,
             db = DB,
             )
 
