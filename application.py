@@ -43,7 +43,7 @@ DB = 'Table1'
 
 @app.route('/')
 def root():
-    return response(200)
+    return "DONE"
 
 @app.route('/get_races')
 def get_races():
