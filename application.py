@@ -41,6 +41,10 @@ USER = 'admin'
 PASSWORD = os.environ['PASSWORD']
 DB = 'Table1'
 
+@app.route('/')
+def root():
+    return response(200)
+
 @app.route('/get_races')
 def get_races():
     a = fastf1.get_event_schedule(1950,include_testing=False, force_ergast=False)
@@ -164,6 +168,8 @@ def signUp():
     cur=conn.cursor()
     cur.execute("INSERT INTO users (fname, lname, email, pass) VALUES (%s, %s, %s, %s )", (data["firstName"], data["lastName"], data["email"], data["pass"]))
     conn.commit()
+
+    
 
     return "done"
 
