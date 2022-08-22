@@ -38,7 +38,8 @@ CORS(app)
 HOST = 'f1-fantasy.cxitdoz2usg3.us-east-2.rds.amazonaws.com'
 PORT = 3306
 USER = 'admin'
-PASSWORD = os.environ['PASSWORD']
+# PASSWORD = os.environ['PASSWORD']
+PASSWORD = os.getenv('PASSWORD')
 DB = 'Table1'
 
 @app.route('/')
@@ -168,8 +169,6 @@ def signUp():
     cur=conn.cursor()
     cur.execute("INSERT INTO users (fname, lname, email, pass) VALUES (%s, %s, %s, %s )", (data["firstName"], data["lastName"], data["email"], data["pass"]))
     conn.commit()
-
-    
 
     return "done"
 
@@ -364,7 +363,7 @@ def getUsersTeams():
             elif (i==8):
                 #budget
                 budget=team[i]
-                # print("budget: " + str(team[i]))
+                currentTeam.append({"budget":budget})
             elif (i==9):
                 teamName = str(team[i])  
                 # print("teamName: " + str(team[i]))     
@@ -375,12 +374,112 @@ def getUsersTeams():
     cur.execute("SELECT * FROM drivers WHERE id = 14")
     result=cur.fetchall()[0]
 
-    #cost[3], driver[1], driverIMG[2], id[0]
-        
-    # print("---------------------------------------------")
-    # print(teamList)
+    print(teamList)
+
 
     return jsonify(teamList=teamList, budget=budget)  
+
+@app.route('/createLeague', methods = ['POST'])
+def createLeague():
+
+    data = request.get_json()
+    
+    load_dotenv() 
+
+    conn = pymysql.connect(
+            host= HOST, 
+            port = PORT,
+            user = USER, 
+            password = PASSWORD,
+            db = DB,
+            )
+
+    cur=conn.cursor()
+    # print(data["token"])
+    cur.execute("SELECT id FROM users WHERE token = %s", (data["token"]))
+    result=cur.fetchall()
+
+    userID = result[0][0]
+
+    cur=conn.cursor()
+    cur.execute("INSERT INTO leagues (userID, leagueName, leaguePass) VALUES (%s, %s, %s)", (userID, data["leagueName"], data["leaguePass"]))
+    conn.commit()
+
+    return "done"
+
+
+@app.route('/getUsersLeagues', methods = ['POST'])
+def getUsersLeagues():
+
+    data = request.get_json()
+    
+    load_dotenv()
+
+    conn = pymysql.connect(
+            host= HOST, 
+            port = int(PORT),
+            user = USER, 
+            password = PASSWORD,
+            db = DB,
+            )
+
+
+    cur=conn.cursor()
+    # print(data["token"])
+    cur.execute("SELECT id FROM users WHERE token = %s", (data["token"]))
+    result=cur.fetchall()
+
+    userID = result[0][0]
+
+    cur.execute("SELECT * FROM leagues WHERE userID = %s", (userID))
+    result=cur.fetchall()
+
+    leaguesList = []
+
+    for league in result:
+        leaguesList.append({"leagueID": league[0], "leagueName":league[2]})
+    
+    
+    # print(leaguesList)
+
+    return jsonify(leaguesList=leaguesList)  
+
+@app.route('/leaveLeague', methods = ['POST'])
+def leaveLeague():
+
+    data = request.get_json()
+    
+    load_dotenv()
+
+    conn = pymysql.connect(
+            host= HOST, 
+            port = int(PORT),
+            user = USER, 
+            password = PASSWORD,
+            db = DB,
+            )
+
+
+    cur=conn.cursor()
+    # print(data["token"])
+    cur.execute("SELECT id FROM users WHERE token = %s", (data["token"]))
+    result=cur.fetchall()
+
+    userID = result[0][0]
+
+    print(userID)
+    print(data["league"])
+
+    cur.execute("DELETE FROM leagues WHERE userID = %s and leagueId = %s", (userID, data["league"]))
+    result=cur.fetchall()
+    print(result)
+
+
+
+    return "done"
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
