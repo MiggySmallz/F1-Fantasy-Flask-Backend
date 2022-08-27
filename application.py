@@ -1,4 +1,5 @@
 from lib2to3.pgen2 import driver
+from re import A
 from urllib import response
 from flask import Flask, jsonify, send_file, request, url_for
 from wsgiref.validate import validator
@@ -467,18 +468,46 @@ def leaveLeague():
 
     userID = result[0][0]
 
-    print(userID)
-    print(data["league"])
-
     cur.execute("DELETE FROM leagues WHERE userID = %s and leagueId = %s", (userID, data["league"]))
-    result=cur.fetchall()
-    print(result)
-
-
+    conn.commit()
 
     return "done"
 
+@app.route('/joinLeague', methods = ['POST'])
+def joinLeague():
 
+    data = request.get_json()
+    
+    load_dotenv() 
+
+    conn = pymysql.connect(
+            host= HOST, 
+            port = PORT,
+            user = USER, 
+            password = PASSWORD,
+            db = DB,
+            )
+
+    cur=conn.cursor()
+    cur.execute("SELECT id FROM users WHERE token = %s", (data["token"]))
+    result=cur.fetchall()
+
+    userID = result[0][0]
+
+    # cur=conn.cursor()
+    cur.execute("SELECT * FROM leagues WHERE leaguePass = %s", (data["leaguePass"]))
+    result=cur.fetchall()
+    if (len(result)>0):
+        cur.execute("SELECT * FROM leagues WHERE userID = %s", (userID))
+        print(cur.fetchall())
+
+        cur.execute("INSERT INTO leagues (userID, leagueName, leaguePass) VALUES (%s, %s, %s)", (userID, data["leagueName"], data["leaguePass"]))
+        conn.commit()
+        print("added to league")
+    else:
+        print("There is no league with this code")
+
+    return "done"
 
 
 if __name__ == "__main__":
