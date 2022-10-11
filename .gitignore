@@ -10,3 +10,4 @@ TableCreation.sql
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+README.txt

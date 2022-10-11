@@ -1,3 +1,4 @@
+from copyreg import constructor
 from lib2to3.pgen2 import driver
 from re import A
 from urllib import response
@@ -29,19 +30,19 @@ app = application
 CORS(app)
 
 
-# HOST = os.getenv('HOST')
-# PORT = 3306
-# USER = os.getenv('USER')
-# PASSWORD = os.getenv('PASSWORD')
-# DB = os.getenv('DB')
-
-
-HOST = 'f1-fantasy.cxitdoz2usg3.us-east-2.rds.amazonaws.com'
+HOST = os.getenv('HOST')
 PORT = 3306
-USER = 'admin'
-# PASSWORD = os.environ['PASSWORD']
+USER = os.getenv('USER')
 PASSWORD = os.getenv('PASSWORD')
-DB = 'Table1'
+DB = os.getenv('DB')
+
+
+# HOST = 'f1-fantasy.cxitdoz2usg3.us-east-2.rds.amazonaws.com'
+# PORT = 3306
+# USER = 'admin'
+# # PASSWORD = os.environ['PASSWORD']
+# PASSWORD = os.getenv('PASSWORD')
+# DB = 'Table1'
 
 @app.route('/')
 def root():
@@ -198,7 +199,7 @@ def logIn():
     # print(email > 0 and password > 0)
 
     # cur.execute("INSERT INTO test2 (fname, lname, email, pass) VALUES (%s, %s, %s, %s )", (data["firstName"], data["lastName"], data["email"], data["pass"]))
-    
+
 
     if email > 0 and password > 0:
         token=secrets.token_urlsafe(10)
@@ -287,11 +288,9 @@ def saveTeam():
             )
 
     cur=conn.cursor()
-    # print(data["token"])
-    cur.execute("SELECT id FROM users WHERE token = %s", (data["token"]))
-    result=cur.fetchall()
-
-    userID = result[0][0]
+    cur.execute("SELECT * FROM teams WHERE teamName = %s", (data["teamName"]))
+    isTeam = len(cur.fetchall())
+    
     teamList = {"slot1":"", "slot2":"", "slot3":"", "slot4":"", "slot5":"", "slot6":""}
     i = 1
 
@@ -303,11 +302,44 @@ def saveTeam():
             teamList["slot6"] = info["id"]
             i += 1
 
-    # print(data["teamName"])
+    # print(isTeam)
+    if (isTeam==0):
 
+        cur.execute("INSERT INTO teams (slot1, slot2, slot3, slot4, slot5, slot6, maxBudget, teamName) VALUES (%s, %s, %s, %s, %s, %s, %s, %s )", (teamList["slot1"], teamList["slot2"], teamList["slot3"], teamList["slot4"], teamList["slot5"], teamList["slot6"], data["budget"], data["teamName"]))
+        conn.commit()
 
-    cur.execute("INSERT INTO teams (userID, slot1, slot2, slot3, slot4, slot5, slot6, maxBudget, teamName) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s )", (userID, teamList["slot1"], teamList["slot2"], teamList["slot3"], teamList["slot4"], teamList["slot5"], teamList["slot6"], data["budget"], data["teamName"]))
-    conn.commit()
+        # gets the most recent teamID
+        cur.execute("SELECT * FROM teams")
+        teamID = cur.fetchall()[len(cur.fetchall())-1][0]
+
+# TESTING --------------------------------------------------------
+
+        cur.execute("SELECT userID FROM users WHERE token = %s", (data["token"]))
+        userID = cur.fetchall()[0][0]
+        cur.execute("INSERT INTO league_teams (userID, leagueID, teamID) VALUES (%s, null, %s)", (userID, teamID))
+
+# TESTING --------------------------------------------------------
+
+        
+# TO DELETE --------------------------------------------
+        #gets user's current list of teams
+        cur.execute("SELECT teamID FROM users WHERE token = %s", (data["token"]))
+        currentTeams = cur.fetchall()[0][0]
+
+        newTeamList = str(currentTeams)+ "," + str(teamID)
+
+        if (currentTeams)!=None:
+            cur.execute("UPDATE users SET teamID = %s WHERE token = %s", (newTeamList, data["token"]))
+            conn.commit()
+        elif (currentTeams)==None:
+            cur.execute("UPDATE users SET teamID = %s WHERE token = %s", (teamID, data["token"]))
+            conn.commit()
+# TO DELETE --------------------------------------------
+
+    elif (isTeam>0):
+        
+        cur.execute("UPDATE teams SET slot1 = %s, slot2 = %s, slot3 = %s, slot4 = %s, slot5 = %s, slot6 = %s, maxBudget = %s WHERE teamName = %s", (teamList["slot1"], teamList["slot2"], teamList["slot3"], teamList["slot4"], teamList["slot5"], teamList["slot6"], data["budget"], data["teamName"]))
+        conn.commit()
 
     return jsonify(teamList=data)  
 
@@ -329,26 +361,41 @@ def getUsersTeams():
     teamList = {}
 
     cur=conn.cursor()
-    # print(data["token"])
-    cur.execute("SELECT id FROM users WHERE token = %s", (data["token"]))
+    
+    budget = 100,000,000
+
+# DELETE ------------------------------------------
+    # # Gets list of user's teams
+    # cur.execute("SELECT teamID FROM users WHERE token = %s", (data["token"]))
+    # result=cur.fetchall()
+    # userTeams = result[0][0]
+    # newuserTeams = tuple(userTeams.split(','))
+
+    
+
+
+    # cur.execute("SELECT * FROM teams WHERE teamID IN %s;", (newuserTeams,))
+    # # cur.execute("SELECT * FROM Table1.`teams(old)` WHERE userID = 3;")
+    
+    # result=cur.fetchall()
+    # print(result)
+# DELETE ------------------------------------------
+
+    cur.execute("SELECT userID FROM users WHERE token = %s", (data["token"]))
+    userID=cur.fetchall()[0][0]
+    cur.execute("SELECT teamID FROM league_teams WHERE userID = %s", (userID))
+    userTeamss = [i[0] for i in cur.fetchall()]
+    cur.execute("SELECT * FROM teams WHERE teamID IN %s;", (userTeamss,))
     result=cur.fetchall()
 
-    userID = result[0][0]
 
-    cur.execute("SELECT * FROM teams WHERE userID = %s", (userID))
-    result=cur.fetchall()
-
-    # print("result is: " + str(result))
     currentTeam = []
     
     for team in result:
-        # print(team)
-        # for i in range(2,len(result[1])):
         for i in range(2,10):
             if (i<7):
                 #driver
                 if (team[i] != 0):
-                    # print("driver: " + str(team[i]))
                     cur.execute("SELECT * FROM drivers WHERE id = %s", (team[i]))
                     result=cur.fetchall()[0]
                     currentTeam.append({"cost":result[3], "driver":result[1], "driverImg":result[2], "id":result[0]})
@@ -356,7 +403,6 @@ def getUsersTeams():
             elif (i==7):
                 #constructor
                 if (team[i] != 0):
-                    # print("constructor: " + str(team[i]))
                     cur.execute("SELECT * FROM constructors WHERE id = %s", (team[i]))
                     result=cur.fetchall()[0]
                     currentTeam.append({"cost":result[3], "constructor":result[1], "constructorImg":result[2], "id":result[0]})
@@ -365,20 +411,58 @@ def getUsersTeams():
                 #budget
                 budget=team[i]
                 currentTeam.append({"budget":budget})
+
             elif (i==9):
-                teamName = str(team[i])  
-                # print("teamName: " + str(team[i]))     
+                #teamName
+                teamName = str(team[i])   
                 teamList[teamName] = currentTeam 
                 currentTeam = []
 
-           
-    cur.execute("SELECT * FROM drivers WHERE id = 14")
-    result=cur.fetchall()[0]
-
-    print(teamList)
-
-
     return jsonify(teamList=teamList, budget=budget)  
+
+@app.route('/deleteTeam', methods = ['POST'])
+def deleteTeam():
+
+    data = request.get_json()
+    
+    load_dotenv()
+
+    conn = pymysql.connect(
+            host= HOST, 
+            port = int(PORT),
+            user = USER, 
+            password = PASSWORD,
+            db = DB,
+            )
+
+    cur=conn.cursor()
+    cur.execute("SELECT teamID FROM teams WHERE teamName = %s", (data["teamName"]))
+    teamID = cur.fetchall()[0][0]
+
+
+    cur.execute("DELETE FROM league_teams WHERE teamID = %s", (teamID))
+    conn.commit()
+
+
+# Delete -------------------------------------
+    cur.execute("SELECT teamID FROM users WHERE token = %s", (data["token"]))
+    userTeams = cur.fetchall()[0][0]
+
+    # removes team from list of user teams
+    userTeams = userTeams.split(",")
+    userTeams.remove(str(teamID))
+    newTeamsList = ""
+    for i in userTeams:
+        newTeamsList += i+","
+
+    cur.execute("UPDATE users SET teamID = %s WHERE token = %s", (newTeamsList[:-1], data["token"]))
+    conn.commit()
+# Delete -------------------------------------
+
+    cur.execute("DELETE FROM teams WHERE teamName = %s", (data["teamName"]))
+    conn.commit()
+
+    return "done"
 
 @app.route('/createLeague', methods = ['POST'])
 def createLeague():
@@ -396,15 +480,46 @@ def createLeague():
             )
 
     cur=conn.cursor()
-    # print(data["token"])
-    cur.execute("SELECT id FROM users WHERE token = %s", (data["token"]))
-    result=cur.fetchall()
+    cur.execute("SELECT * FROM leagues WHERE leagueName = %s", (data["leagueName"]))
+    isLeague = len(cur.fetchall())
+    
+    if (isLeague==0):
 
-    userID = result[0][0]
+        cur.execute("INSERT INTO leagues (leagueName, leaguePass) VALUES (%s, %s)", (data["leagueName"], data["leaguePass"]))
+        conn.commit()
 
-    cur=conn.cursor()
-    cur.execute("INSERT INTO leagues (userID, leagueName, leaguePass) VALUES (%s, %s, %s)", (userID, data["leagueName"], data["leaguePass"]))
-    conn.commit()
+        #gets the most recent leagueID
+        cur.execute("SELECT * FROM leagues")
+        leagueID = cur.fetchall()[len(cur.fetchall())-1][0]
+
+# TESTING --------------------------------------------------------
+
+        cur.execute("SELECT userID FROM users WHERE token = %s", (data["token"]))
+        userID = cur.fetchall()[0][0]
+        cur.execute("INSERT INTO league_teams (userID, leagueID, teamID) VALUES (%s, %s, null)", (userID, leagueID))
+        conn.commit()
+
+# TESTING --------------------------------------------------------
+
+
+# DELETE --------------------------------------------------------
+        # #gets user's current list of leagues
+        # cur.execute("SELECT leagueID FROM users WHERE token = %s", (data["token"]))
+        # currentLeagues = cur.fetchall()[0][0]
+        # newLeagueList = str(currentLeagues)+ "," + str(leagueID)
+
+
+        # if (currentLeagues)!=None:
+        #     cur.execute("UPDATE users SET leagueID = %s WHERE token = %s", (newLeagueList, data["token"]))
+        #     conn.commit()
+        # elif (currentLeagues)==None:
+        #     cur.execute("UPDATE users SET leagueID = %s WHERE token = %s", (leagueID, data["token"]))
+        #     conn.commit()
+# DELETE --------------------------------------------------------
+
+    elif (isLeague>0):
+        
+        print("already league")
 
     return "done"
 
@@ -424,24 +539,32 @@ def getUsersLeagues():
             db = DB,
             )
 
-
     cur=conn.cursor()
-    # print(data["token"])
-    cur.execute("SELECT id FROM users WHERE token = %s", (data["token"]))
+
+    cur.execute("SELECT userID FROM users WHERE token = %s", (data["token"]))
+    userID=cur.fetchall()[0][0]
+    cur.execute("SELECT leagueID FROM league_teams WHERE userID = %s", (userID))
+    userleagues = [i[0] for i in cur.fetchall()]
+    cur.execute("SELECT * FROM leagues WHERE leagueID IN %s;", (userleagues,))
     result=cur.fetchall()
 
-    userID = result[0][0]
+# DELETE ------------------------------------------
+    # # Gets list of user's leagues
+    # cur.execute("SELECT leagueID FROM users WHERE token = %s", (data["token"]))
+    # result=cur.fetchall()
+    # userLeagues = result[0][0]
+    # newuserLeagues = tuple(userLeagues.split(','))
 
-    cur.execute("SELECT * FROM leagues WHERE userID = %s", (userID))
-    result=cur.fetchall()
+
+    # cur.execute("SELECT * FROM leagues WHERE leagueID IN %s;", (newuserLeagues,))
+    
+    # result=cur.fetchall()
+# DELETE ------------------------------------------
 
     leaguesList = []
 
     for league in result:
-        leaguesList.append({"leagueID": league[0], "leagueName":league[2]})
-    
-    
-    # print(leaguesList)
+        leaguesList.append({"leagueID": league[0], "leagueName":league[1]})
 
     return jsonify(leaguesList=leaguesList)  
 
@@ -460,15 +583,24 @@ def leaveLeague():
             db = DB,
             )
 
-
     cur=conn.cursor()
-    # print(data["token"])
-    cur.execute("SELECT id FROM users WHERE token = %s", (data["token"]))
-    result=cur.fetchall()
 
-    userID = result[0][0]
+# DELETE ----------------------------------------------
+    # cur.execute("SELECT leagueID FROM users WHERE token = %s", (data["token"]))
+    # userLeagues = cur.fetchall()[0][0]
 
-    cur.execute("DELETE FROM leagues WHERE userID = %s and leagueId = %s", (userID, data["league"]))
+    # # removes team from list of user teams
+    # userLeagues = userLeagues.split(",")
+    # userLeagues.remove(str(data["leagueID"]))
+    # newLeaguesList = ""
+    # for i in userLeagues:
+    #     newLeaguesList += i+","
+
+    # cur.execute("UPDATE users SET leagueID = %s WHERE token = %s", (newLeaguesList[:-1], data["token"]))
+    # conn.commit()
+# DELETE ----------------------------------------------
+
+    cur.execute("DELETE FROM league_teams WHERE leagueID = %s", (data["leagueID"]))
     conn.commit()
 
     return "done"
@@ -489,26 +621,95 @@ def joinLeague():
             )
 
     cur=conn.cursor()
-    cur.execute("SELECT id FROM users WHERE token = %s", (data["token"]))
-    result=cur.fetchall()
-
-    userID = result[0][0]
-
-    # cur=conn.cursor()
     cur.execute("SELECT * FROM leagues WHERE leaguePass = %s", (data["leaguePass"]))
-    result=cur.fetchall()
-    if (len(result)>0):
-        cur.execute("SELECT * FROM leagues WHERE userID = %s", (userID))
-        print(cur.fetchall())
+    league = cur.fetchall()
 
-        cur.execute("INSERT INTO leagues (userID, leagueName, leaguePass) VALUES (%s, %s, %s)", (userID, data["leagueName"], data["leaguePass"]))
+    if (league!=()):
+
+        leagueID = league[0][0]
+
+        cur.execute("SELECT userID FROM users WHERE token = %s", (data["token"]))
+        userID = cur.fetchall()[0][0]
+        cur.execute("INSERT INTO league_teams (userID, leagueID, teamID) VALUES (%s, %s, null)", (userID, leagueID))
         conn.commit()
-        print("added to league")
-    else:
-        print("There is no league with this code")
+
+        # #gets user's current list of leagues
+        # cur.execute("SELECT leagueID FROM users WHERE token = %s", (data["token"]))
+        # currentLeagues = cur.fetchall()[0][0]
+        # newLeagueList = str(currentLeagues)+ "," + str(leagueID)
+
+
+        # if (currentLeagues)!=None:
+        #     cur.execute("UPDATE users SET leagueID = %s WHERE token = %s", (newLeagueList, data["token"]))
+        #     conn.commit()
+        # elif (currentLeagues)==None:
+        #     cur.execute("UPDATE users SET leagueID = %s WHERE token = %s", (leagueID, data["token"]))
+        #     conn.commit()
+
+    elif (league==()):
+        
+        return "There is no league"
+
 
     return "done"
 
+@app.route('/getLeagueInfo', methods = ['POST'])
+def getLeagueInfo():
+
+    data = request.get_json()
+    
+    load_dotenv() 
+
+    conn = pymysql.connect(
+            host= HOST, 
+            port = PORT,
+            user = USER, 
+            password = PASSWORD,
+            db = DB,
+            )
+
+    cur=conn.cursor()
+    cur.execute("SELECT leagueName FROM leagues WHERE leagueID = %s", (data["leagueID"]))
+    leagueName = cur.fetchall()[0][0]
+
+
+    cur.execute("SELECT userID FROM league_teams WHERE leagueID = %s", (data["leagueID"]))
+    leagueMembers = [i[0] for i in cur.fetchall()]
+
+    cur.execute("SELECT fname FROM users WHERE userID IN %s", (leagueMembers,))
+    leagueMembersNames = [i[0] for i in cur.fetchall()]
+
+
+
+    # print(leagueMembers)
+    # print(leagueMembersNames)
+
+    memberTeamsList = {}
+
+    for member in leagueMembers:
+        cur.execute("SELECT teamID FROM league_teams WHERE userID = %s AND leagueID = %s",(member, data["leagueID"]))
+        memberTeam = cur.fetchall()[0][0]
+        
+        if memberTeam != None:
+            cur.execute("SELECT slot1, slot2, slot3, slot4, slot5, slot6 FROM teams WHERE teamID = %s",(memberTeam))
+            teamList = cur.fetchall()[0]
+            # print(teamList)
+
+            cur.execute("SELECT driver, driverImg FROM drivers WHERE id IN %s",(teamList,))
+            # print([{i[0]:i[1]} for i in cur.fetchall()])
+            memberTeamsList[leagueMembersNames[leagueMembers.index(member)]] = [{i[0]:i[1]} for i in cur.fetchall()]
+
+            cur.execute("SELECT constructor, constructorImg FROM constructors WHERE id = %s", (teamList[5]))
+            constructor = cur.fetchall()
+            
+            
+            if constructor!=():
+                memberTeamsList[leagueMembersNames[leagueMembers.index(member)]].append({constructor[0][0]:constructor[0][1]})
+
+
+    # print(memberTeamsList)
+
+    return jsonify(memberTeamsList=memberTeamsList, leagueName=leagueName)  
 
 if __name__ == "__main__":
     app.run(debug=True)
