@@ -3,7 +3,7 @@
 env/
 /node_modules
 /Lib
-/f1Fantasy
+# /f1Fantasy
 # /cache
 TableCreation.sql
 # Elastic Beanstalk Files
