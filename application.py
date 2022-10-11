@@ -30,19 +30,19 @@ app = application
 CORS(app)
 
 
-HOST = os.getenv('HOST')
-PORT = 3306
-USER = os.getenv('USER')
-PASSWORD = os.getenv('PASSWORD')
-DB = os.getenv('DB')
-
-
-# HOST = 'f1-fantasy.cxitdoz2usg3.us-east-2.rds.amazonaws.com'
+# HOST = os.getenv('HOST')
 # PORT = 3306
-# USER = 'admin'
-# # PASSWORD = os.environ['PASSWORD']
+# USER = os.getenv('USER')
 # PASSWORD = os.getenv('PASSWORD')
-# DB = 'Table1'
+# DB = os.getenv('DB')
+
+
+HOST = 'f1-fantasy.cxitdoz2usg3.us-east-2.rds.amazonaws.com'
+PORT = 3306
+USER = 'admin'
+# PASSWORD = os.environ['PASSWORD']
+PASSWORD = os.getenv('PASSWORD')
+DB = 'Table1'
 
 @app.route('/')
 def root():
